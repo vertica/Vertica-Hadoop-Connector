@@ -1,0 +1,6 @@
+Cleaning up the staging area hdfs://eng83.verticacorp.com:29510/scratch_b/condor/local/execute/dir_21786/Test/hadoop/mapred/staging/condor/.staging/job_201206041603_0017
+PriviledgedActionException as:condor cause:org.apache.pig.backend.executionengine.ExecException: ERROR 2118: java.sql.SQLException: [Vertica][VJDBC](4367) ERROR: Permission denied for relation ints
+ERROR 2997: Unable to recreate exception from backend error: org.apache.pig.backend.executionengine.ExecException: ERROR 2118: java.sql.SQLException: [Vertica][VJDBC](4367) ERROR: Permission denied for relation ints
+1 map reduce job(s) failed!
+ERROR 2244: Job failed, hadoop does not return any error message
+Details at logfile: /scratch_b/condor/local/execute/dir_21786/Test/pigtest_smoke/pigshell.out

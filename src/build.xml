@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="jar" name="hadoop-vertica">
+	<description>
+		Apache Hadoop/Pig Vertica Project contains 
+		source code for the following JARs:
+		* Apache Hadoop to Vertica Connector.
+		* Apache Pig    to Vertica Connector.
+		* Example to use the Hadoop/Vertica connector.
+	</description>
+
+    <property environment="env"/>
+	<condition property="ispig07">
+		<contains string="${pig.version}" substring="0.7"/>
+	</condition>
+	<target name="executeRecursively">
+		<ant dir="hadoop-connector" target="${action}"/>
+		<ant dir="hadoop-example"   target="${action}"/>
+		<ant dir="pig-connector"    target="${action}"/>
+		<antcall target="executeOnSqueal">
+			<param name="action" value="${action}"/>
+		</antcall>
+	</target>
+	
+	<target name="executeOnSqueal" if="ispig07">
+		<ant dir="squeal" target="${action}"/>
+	</target>
+		
+	<target name="doc"
+		description="Generate Javadocs for ALL modules">
+		<antcall target="executeRecursively">
+			<param name="action" value="doc"/>
+		</antcall>
+	</target>
+	
+	<target name="jar" 
+		description="Compile JARs for ALL modules">
+		<antcall target="executeRecursively">
+			<param name="action" value="jar"/>
+		</antcall>
+	</target>
+	<target name="clean">
+		<antcall target="executeRecursively">
+			<param name="action" value="clean"/>
+		</antcall>
+	</target>
+
+	<target name="hadoop-connector"
+		description="Compile JAR for Hadoop/Vertica Connector">
+		<ant dir="hadoop-connector" target="jar"/>
+	</target>
+	<target name="hadoop-example" depends="hadoop-connector" 
+		description="Compile JAR for an example that uses Hadoop/Vertica Connector">
+		<ant dir="hadoop-example" target="jar"/>
+	</target>
+	<target name="pig-connector" 
+		description="Compile JAR for Pig/Vertica Connector">
+		<ant dir="pig-connector" target="jar"/>
+	</target>
+	<target name="squeal" if="ispig07">
+		<ant dir="squeal" target="jar"/>
+	</target>
+</project>

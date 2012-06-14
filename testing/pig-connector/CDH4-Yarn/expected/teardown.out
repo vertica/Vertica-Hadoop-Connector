@@ -1,0 +1,6 @@
+fs.default.name is deprecated. Instead, use fs.defaultFS
+fs.default.name is deprecated. Instead, use fs.defaultFS
+rmr: DEPRECATED: Please use 'rm -r' instead.
+Deleted smoke-test.dat
+rmr: DEPRECATED: Please use 'rm -r' instead.
+Deleted ints.dat
