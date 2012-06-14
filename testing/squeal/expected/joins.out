@@ -1,0 +1,25 @@
+10/10/18 23:57:23 INFO squeal.Squeal: Logging error messages to: /home/rvenkatesh/dev/Linux64/Test/squeal_smoke/pigshell.out
+Constructing server
+Configuring vertica connection
+Translating...
+Running script schema refresh(SQL)
+ROLLBACK: schema "squeal_PigLatin_joins_pig" does not exist
+Time: 144ms
+Running script sql setup(SQL)
+Time: 123ms
+Running script test sql(SQL)
+Time: 63ms
+Running script load3(PIG)
+Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+Total input paths to process : 1
+Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+Total input paths to process : 1
+Time: 31612ms
+Running script populate vdata4(SQL)
+Time: 450ms
+Running script store vdata5(PIG)
+Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+Time: 17686ms
+Total time: 50252ms
+1	1	100	q	1	1	100	q	1	2000
+Deleted hdfs://hermetic:9935/user/rvenkatesh/joins
