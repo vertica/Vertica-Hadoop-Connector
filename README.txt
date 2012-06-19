@@ -31,7 +31,8 @@ Compile:
    pig_version- Pig version.
    VERTICA_JAR- Path to Vertica JDBC jar.
    JAR_DIR    - Directory where the new jar files & docs should be stored.
-   
+
+   Run - make jar
 TODO: 
     Use Maven to download dependencies.
 	helpful commands for running examples.

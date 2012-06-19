@@ -1,3 +1,5 @@
+/* Copyright (c) 2005 - 2012 Vertica, an HP company -*- Java -*- */
+
 package com.vertica.pig;
 
 import java.util.List;
