@@ -1,6 +1,0 @@
--I INFO.pig.Main.*Logging.error.messages.to:
--I Deleted.hdfs:
--I Details.*at.*logfile:
--I Use.*GenericOptionsParser
--I ERROR.*1002
--I Total.*input.*paths

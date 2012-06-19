@@ -1,3 +1,0 @@
-12/01/17 22:21:54 INFO pig.Main: Logging error messages to: /scratch_b/rvhome/code/Linux64/Test/verticadb20018/pigtest_smoke/pigshell.out
-Deleted hdfs://eng23.verticacorp.com:29451/user/rvenkatesh/smoke-test.dat
-Deleted hdfs://eng23.verticacorp.com:29451/user/rvenkatesh/ints.dat
