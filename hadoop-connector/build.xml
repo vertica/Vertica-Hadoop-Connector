@@ -12,7 +12,7 @@
     <property name="debuglevel" value="source,lines,vars"/>
 	<property name="javac.source" value="1.6" />
 	<property name="javac.target" value="1.6" />
-	<property name="version" value="1.4.1" />
+	<property name="version" value="1.6.0" />
 
     <property name="src.dir" location="${basedir}" />
 	<property name="test.dir" location="${basedir}/test" />
