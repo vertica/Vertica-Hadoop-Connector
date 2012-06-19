@@ -18,15 +18,22 @@ license/PersonalCLA.pdf: If you are contributing for yourself
 license/CorporateCLA.pdf: If you are contributing on behalf of your company
 
 Directory structure:
-  ./data              Data files to be used with the examples.
-  ./doc               Connector Documentation (generated with Javadocs)
-  ./src               Source code
-  hadoop-vertica.jar  Hadoop to Vertica Connector
-  pig-vertica.jar     Pig to Vertica Connector
-  hadoop-vertica-example.jar Example for using the Hadoop Connector
+  ./hadoop-vertica    Hadoop to Vertica Connector
+  ./pig-vertica       Pig to Vertica Connector
+  ./hadoop-vertica-example Example for using the Hadoop Connector
+  ./squeal            Squeal - a pig to sql translator.
 
+Compile:
+   Set the following environment variables: 
+   HADOOP_HOME - Directory containing the hadoop installation.
+   PIG_HOME   - Directory containing Apache Pig installation.
+   BUILDDIR   - Temporary directory for storing build files.
+   pig_version- Pig version.
+   VERTICA_JAR- Path to Vertica JDBC jar.
+   JAR_DIR    - Directory where the new jar files & docs should be stored.
+   
 TODO: 
-    helpful commands for compiling the code.
+    Use Maven to download dependencies.
 	helpful commands for running examples.
 	Examples for pig connector.
 	Examples for Hadoop streaming.
