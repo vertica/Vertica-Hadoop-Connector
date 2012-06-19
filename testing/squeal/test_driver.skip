@@ -1,0 +1,5 @@
+-I INFO.squeal.Squeal.*Logging.error.messages.to:
+-I hdfs://
+-I ^Time:
+-I ^Total.time:
+-I ^ROLLBACK:.schema.*does.not.exist

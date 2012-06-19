@@ -1,0 +1,11 @@
+$HADOOP_HOME/bin/hadoop fs -copyFromLocal $PWD/data/datasource ./datasource
+$HADOOP_HOME/bin/hadoop jar $HADOOP_HOME/$STREAM_JAR \
+	-libjars $JAR_DIR/hadoop-vertica.jar \
+	$VERTICA_CLUSTER_INFORMATION \
+	-D mapred.reduce.tasks=0 \
+	-Dmapred.vertica.output.table.name="$1" \
+	-Dmapred.vertica.output.delimiter="$2" \
+	-input datasource -output output \
+	-mapper "python $PWD/streaming/hdfs2v_mapper.py $2" \
+	-outputformat com.vertica.hadoop.deprecated.VerticaStreamingOutput
+$HADOOP_HOME/bin/hadoop fs -rm datasource

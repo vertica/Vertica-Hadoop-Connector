@@ -1,0 +1,41 @@
+fs.default.name is deprecated. Instead, use fs.defaultFS
+fs.default.name is deprecated. Instead, use fs.defaultFS
+dfs.df.interval is deprecated. Instead, use fs.df.interval
+dfs.max.objects is deprecated. Instead, use dfs.namenode.max.objects
+hadoop.native.lib is deprecated. Instead, use io.native.lib.available
+dfs.data.dir is deprecated. Instead, use dfs.datanode.data.dir
+dfs.name.dir is deprecated. Instead, use dfs.namenode.name.dir
+fs.default.name is deprecated. Instead, use fs.defaultFS
+fs.checkpoint.dir is deprecated. Instead, use dfs.namenode.checkpoint.dir
+dfs.block.size is deprecated. Instead, use dfs.blocksize
+dfs.access.time.precision is deprecated. Instead, use dfs.namenode.accesstime.precision
+dfs.replication.min is deprecated. Instead, use dfs.namenode.replication.min
+dfs.name.edits.dir is deprecated. Instead, use dfs.namenode.edits.dir
+dfs.replication.considerLoad is deprecated. Instead, use dfs.namenode.replication.considerLoad
+dfs.balance.bandwidthPerSec is deprecated. Instead, use dfs.datanode.balance.bandwidthPerSec
+dfs.safemode.threshold.pct is deprecated. Instead, use dfs.namenode.safemode.threshold-pct
+dfs.http.address is deprecated. Instead, use dfs.namenode.http-address
+dfs.name.dir.restore is deprecated. Instead, use dfs.namenode.name.dir.restore
+dfs.https.client.keystore.resource is deprecated. Instead, use dfs.client.https.keystore.resource
+dfs.backup.address is deprecated. Instead, use dfs.namenode.backup.address
+dfs.backup.http.address is deprecated. Instead, use dfs.namenode.backup.http-address
+dfs.permissions is deprecated. Instead, use dfs.permissions.enabled
+dfs.safemode.extension is deprecated. Instead, use dfs.namenode.safemode.extension
+dfs.datanode.max.xcievers is deprecated. Instead, use dfs.datanode.max.transfer.threads
+dfs.https.need.client.auth is deprecated. Instead, use dfs.client.https.need-auth
+dfs.https.address is deprecated. Instead, use dfs.namenode.https-address
+dfs.replication.interval is deprecated. Instead, use dfs.namenode.replication.interval
+fs.checkpoint.edits.dir is deprecated. Instead, use dfs.namenode.checkpoint.edits.dir
+dfs.write.packet.size is deprecated. Instead, use dfs.client-write-packet-size
+dfs.permissions.supergroup is deprecated. Instead, use dfs.permissions.superusergroup
+topology.script.number.args is deprecated. Instead, use net.topology.script.number.args
+dfs.secondary.http.address is deprecated. Instead, use dfs.namenode.secondary.http-address
+fs.checkpoint.period is deprecated. Instead, use dfs.namenode.checkpoint.period
+topology.node.switch.mapping.impl is deprecated. Instead, use net.topology.node.switch.mapping.impl
+io.bytes.per.checksum is deprecated. Instead, use dfs.bytes-per-checksum
+Cleaning up the staging area hdfs://hermetic:9935/home/rvenkatesh/trunk/Linux64/Test/verticadb502/hadoop/mapred/staging/rvenkatesh/.staging/job_201204301542_0017
+PriviledgedActionException as:rvenkatesh (auth:SIMPLE) cause:org.apache.pig.backend.executionengine.ExecException: ERROR 2118: java.sql.SQLException: [Vertica][VJDBC](100081) ERROR: Permission denied for relation ints
+ERROR 2997: Unable to recreate exception from backend error: org.apache.pig.backend.executionengine.ExecException: ERROR 2118: java.sql.SQLException: [Vertica][VJDBC](100081) ERROR: Permission denied for relation ints
+1 map reduce job(s) failed!
+ERROR 2244: Job failed, hadoop does not return any error message
+Details at logfile: /home/rvenkatesh/trunk/Linux64/Test/verticadb502/pigtest_smoke/pigshell.out

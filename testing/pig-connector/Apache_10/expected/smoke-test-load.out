@@ -1,0 +1,40 @@
+Total input paths to process : 19
+Total input paths to process : 19
+1|ONE
+1|ONE
+1|ONE
+2|TWO
+2|TWO
+3|THREE
+3|THREE
+4|FOUR
+4|FOUR
+4|FOUR
+5|FIVE
+5|FIVE
+6|SIX
+6|SIX
+7|SEVEN
+7|SEVEN
+8|EIGHT
+8|EIGHT
+9|NINE
+9|NINE
+10|TEN
+10|TEN
+11|ELEVEN
+11|ELEVEN
+12|TWELVE
+12|TWELVE
+13|THIRTEEN
+13|THIRTEEN
+14|
+14|
+15|FIFTEEN
+15|FIFTEEN
+16|SIXTEEN
+16|SIXTEEN
+Deleted hdfs://localhost.localdomain:9935/user/rvenkatesh/result
+Total input paths to process : 2
+Total input paths to process : 2
+Deleted hdfs://localhost.localdomain:9935/user/rvenkatesh/result
