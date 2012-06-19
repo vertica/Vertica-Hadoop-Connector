@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="jar" name="hadoop-vertica">
+    <property environment="env"/>
+	<!--Required parameters. You have to specify these on the ANT command line -->
+	<!--JUNIT jars should be in the lib path. For e.g. specify using -lib -->
+	<property name="vertica.jar" value = "" />
+	<property name="hadoop.dir" value="" />
+	<property name="dist" value=""/>
+	<property name="doc.dir" value="" />
+	
+	<property name="jar.name" value="hadoop-vertica-example" />
+    <property name="debuglevel" value="source,lines,vars"/>
+	<property name="javac.source" value="1.6" />
+	<property name="javac.target" value="1.6" />
+	<property name="version" value="1.4.1" />
+
+    <property name="src.dir" location="${basedir}" />
+
+	<property name="build.dir" location="${basedir}/build" />
+	<property name="build.classes" location="${build.dir}/hadoop-example/" />
+
+	<!-- Lesson: You can add location of jar files here -->
+    <path id="compile.classpath">
+		<pathelement location="${vertica.jar}"/>
+		<pathelement location="${hadoop-connector.jar}"/>
+        <pathelement location="${build.classes}"/>
+		<fileset dir="${hadoop.dir}">
+			<include name="**/*.jar"/>
+			<exclude name="junit-3.8.1.jar"/>
+		</fileset>
+    </path>
+
+    <target name="init">
+    	<condition property="notJava6">
+			<not><equals arg1="${java.specification.version}" arg2="1.6"/></not>
+    	</condition>
+
+    	<fail if="notJava6" message="JDK 1.6 is required." />
+	</target>
+
+    <target name="clean">
+        <delete dir="${build.classes}"/>
+        <delete file="${dist}/${jar.name}.jar"/>
+        <delete dir="${doc.dir}/hadoop-examples"/>
+    </target>
+
+    <target depends="clean" name="cleanall"/>
+    
+	<target depends="init" name="compile">
+		<mkdir dir="${build.classes}"/>
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${build.classes}" 
+				source="${javac.source}" target="${javac.target}">
+            <src path="${src.dir}"/>
+            <classpath refid="compile.classpath"/>
+        </javac>
+    </target>
+	
+	<target name="doc">
+		<javadoc destdir="${doc.dir}/hadoop-examples" breakiterator="yes">
+            <classpath refid="compile.classpath"/>
+			<fileset dir="${src.dir}">
+				<include name="**/*.java"/>
+			</fileset>
+		</javadoc>
+	</target>
+
+	<target name="jar" depends="compile" description="Create main jar">
+		<mkdir dir="${dist}"/>
+    	<tstamp>
+	    	<format property="builtat" pattern="yyyy-MM-dd HH:mm:ss Z" timezone="America/New_York"/>
+		</tstamp>        
+		<exec executable="svnversion" outputproperty="svnversion"/>
+		<exec executable="uname" outputproperty="buildsystem"><arg value="-a"/></exec>
+    	<jar jarfile="${dist}/${jar.name}.jar" basedir="${build.classes}">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+			    <attribute name="Implementation-Vendor" value="Vertica Systems, Inc."/>
+			    <attribute name="Implementation-Title" value="Apache Hadoop - Vertica Connector Examples"/>
+				<attribute name="Implementation-Version" value="${version}"/>
+				<attribute name="SVN-Revision" value="${svnversion}"/>
+				<attribute name="Build-System" value="${buildsystem}"/>
+				<attribute name="Build-Time" value="${builtat}"/>
+			</manifest>
+		</jar>
+	</target>
+</project>
