@@ -1,8 +1,0 @@
-test: smoke-test-load
-test: smoke-test-store
-test: passwords
-test: passwords_bad_load
-test: passwords_bad_store
-test: no_permissions
-test: bugs
-test: teardown
