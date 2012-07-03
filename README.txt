@@ -27,6 +27,7 @@ Compile:
    Set the following environment variables: 
    HADOOP_HOME - Directory containing the hadoop installation.
    PIG_HOME   - Directory containing Apache Pig installation.
+   PIG_JAR-     Name of pig jar.
    BUILDDIR   - Temporary directory for storing build files.
    pig_version- Pig version.
    VERTICA_JAR- Path to Vertica JDBC jar.

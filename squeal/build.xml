@@ -71,6 +71,15 @@
         </javac>
     </target>
 	
+	<target name="doc">
+		<javadoc destdir="${doc.dir}/pig-connector" breakiterator="yes">
+            <classpath refid="compile.classpath"/>
+			<fileset dir="${src.dir}">
+				<include name="**/*.java"/>
+			</fileset>
+		</javadoc>
+	</target>
+
 	<target name="jar" depends="compile" description="Create main jar">
 		<mkdir dir="${dist}"/>
     	<tstamp>
