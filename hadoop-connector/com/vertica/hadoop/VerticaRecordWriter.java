@@ -3,23 +3,14 @@
 package com.vertica.hadoop;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.BatchUpdateException;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.Vector;
-import java.util.Map;
-import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
@@ -33,7 +24,7 @@ public class VerticaRecordWriter extends RecordWriter<Text, VerticaRecord> {
 	long batchSize = 0;
 	long numRecords = 0;
 
-	public VerticaRecordWriter(Connection conn, String writerTable, long batch) 
+	public VerticaRecordWriter(Connection conn, String writerTable, long batch)
 		throws SQLException 
 	{
 		this.connection = conn;
@@ -84,8 +75,9 @@ public class VerticaRecordWriter extends RecordWriter<Text, VerticaRecord> {
 	@Override
 	public void close(TaskAttemptContext context) throws IOException {
 		try {
+      // committing and closing the connection is handled by the VerticaTaskOutputCommitter
+      if (LOG.isDebugEnabled()) { LOG.debug("executeBatch called during close"); }
 			statement.executeBatch();
-			connection.close();
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
@@ -101,6 +93,7 @@ public class VerticaRecordWriter extends RecordWriter<Text, VerticaRecord> {
 			record.write(statement);
 			numRecords++;
 			if (numRecords % batchSize == 0) {
+        if (LOG.isDebugEnabled()) { LOG.debug("executeBatch called on batch of size " + batchSize); }
 				statement.executeBatch();
 			}
 		} catch (Exception e) {
