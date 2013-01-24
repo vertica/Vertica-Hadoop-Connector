@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="jar" name="squeal">
+  <include file="../build-common.xml"/>
+
     <property environment="env"/>
 	<!--Required parameters. You have to specify these on the ANT command line -->
 	<!--JUNIT jars should be in the lib path. For e.g. specify using -lib -->
@@ -24,7 +26,7 @@
 	<property name="build.dir" location="${basedir}/build" />
 	<property name="build.classes" location="${build.dir}/squeal/classes"/>
   <property name="dist" value="${build.dir}/squeal/jar"/>
-  <property name="jar.file" location="${dist}/${jar.name}.jar" />
+  <property name="jar.file" location="${dist}/${jar.name}-${build.version}.jar" />
 
 	<!-- Lesson: You can add location of jar files here -->
     <path id="compile.classpath">
@@ -74,19 +76,7 @@
     </fail>
   </target>
 
-  <target name="requirepigjar">
-    <fail message="Property &quot;pig.jar&quot; needs to be set to a valid jar file">
-      <condition>
-          <or>
-              <equals arg1="${pig.jar}" arg2=""/>
-              <not><isset property="pig.jar"/></not>
-              <not><available file="${pig.jar}" type="file"/></not>
-         </or>
-     </condition>
-    </fail>
-  </target>
-
-	<target depends="requirehadoopdir,requirepigjar,init" name="compile">
+	<target depends="common.requirehadoopdir,common.requirepigjar,init" name="compile">
     <echo>hadoop.dir          : ${hadoop.dir}</echo>
     <echo>pig.jar             : ${pig.jar}</echo>
 		<mkdir dir="${build.classes}"/>

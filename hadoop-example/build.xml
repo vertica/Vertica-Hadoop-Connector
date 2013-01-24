@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="jar" name="hadoop-example">
+  <include file="../build-common.xml"/>
+
     <property environment="env"/>
 	<!--Required parameters. You have to specify these on the ANT command line -->
 	<!--JUNIT jars should be in the lib path. For e.g. specify using -lib -->
 	<property name="vertica.jar" value = "" />
-  <property name="hadoop-connector.jar" value = "${basedir}/../hadoop-connector/build/hadoop-connector/jar/hadoop-vertica.jar" />
 	<property name="hadoop.dir" value="" />
 	<property name="doc.dir" value="" />
 	
@@ -18,7 +19,7 @@
 
 	<property name="build.dir" location="${basedir}/build" />
   <property name="dist" value="${build.dir}/hadoop-example/jar"/>
-  <property name="jar.file" location="${dist}/${jar.name}.jar" />
+  <property name="jar.file" location="${dist}/${jar.name}-${build.version}.jar" />
 	<property name="build.classes" location="${build.dir}/hadoop-example/" />
 
 	<!-- Lesson: You can add location of jar files here -->
@@ -48,19 +49,7 @@
 
     <target depends="clean" name="cleanall"/>
     
-  <target name="requirehadoopdir">
-    <fail message="Property &quot;hadoop.dir&quot; needs to be set to a valid directory">
-      <condition>
-          <or>
-              <equals arg1="${hadoop.dir}" arg2=""/>
-              <not><isset property="hadoop.dir"/></not>
-              <not><available file="${hadoop.dir}" type="dir"/></not>
-         </or>
-     </condition>
-    </fail>
-  </target>
-
-	<target depends="requirehadoopdir,init" name="compile">
+	<target depends="common.requirehadoopdir,init" name="compile">
 		<mkdir dir="${build.classes}"/>
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="${build.classes}" 

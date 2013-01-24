@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="jar" name="pig-vertica">
+  <include file="../build-common.xml"/>
+
     <property environment="env"/>
 	<!--Required parameters. You have to specify these on the ANT command line -->
 	<!--JUNIT jars should be in the lib path. For e.g. specify using -lib -->
 	<property name="vertica.jar" value = "" />
-	<property name="hadoop-connector.jar" value = "${basedir}/../hadoop-connector/build/hadoop-connector/jar/hadoop-vertica.jar" />
 	<property name="doc.dir" value="" />
 	
 	<property name="jar.name" value="pig-vertica" />
@@ -17,7 +18,7 @@
 
 	<property name="build.dir" location="${basedir}/build" />
   <property name="dist" value="${build.dir}/pig-connector/jar"/>
-  <property name="jar.file" location="${dist}/${jar.name}.jar" />
+  <property name="jar.file" location="${dist}/${jar.name}-${build.version}.jar" />
 	<property name="build.classes" location="${build.dir}/pig-connector/classes"/>
 
 	<!-- Lesson: You can add location of jar files here -->
@@ -49,32 +50,7 @@
         <delete dir="${doc.dir}/pig-connector"/>
     </target>
 
-
-  <target name="requirehadoopdir">
-    <fail message="Property &quot;hadoop.dir&quot; needs to be set to a valid directory">
-      <condition>
-          <or>
-              <equals arg1="${hadoop.dir}" arg2=""/>
-              <not><isset property="hadoop.dir"/></not>
-              <not><available file="${hadoop.dir}" type="dir"/></not>
-         </or>
-     </condition>
-    </fail>
-  </target>
-
-  <target name="requirepigjar">
-    <fail message="Property &quot;pig.jar&quot; needs to be set to a valid jar file">
-      <condition>
-          <or>
-              <equals arg1="${pig.jar}" arg2=""/>
-              <not><isset property="pig.jar"/></not>
-              <not><available file="${pig.jar}" type="file"/></not>
-         </or>
-     </condition>
-    </fail>
-  </target>
-
-	<target depends="requirehadoopdir, requirepigjar, init" name="compile">
+	<target depends="common.requirehadoopdir,common.requirepigjar,init" name="compile">
     <fail unless="hadoop.dir">Property hadoop.dir must be set.</fail>
     <fail unless="pig.jar">Property pig.jar must be set.</fail>
     <echo>hadoop.dir          : ${hadoop.dir}</echo>

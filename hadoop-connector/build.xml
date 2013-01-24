@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="jar" name="hadoop-connector">
+  <include file="../build-common.xml"/>
+
     <property environment="env"/>
 	<!--Required parameters. You have to specify these on the ANT command line -->
 	<!--JUNIT jars should be in the lib path. For e.g. specify using -lib -->
@@ -17,7 +19,7 @@
 
 	<property name="build.dir" location="${basedir}/build" />
   <property name="dist" value="${build.dir}/hadoop-connector/jar"/>
-  <property name="jar.file" location="${dist}/${jar.name}.jar" />
+  <property name="jar.file" location="${dist}/${jar.name}-${build.version}.jar" />
 	<property name="build.classes" location="${build.dir}/hadoop-connector/classes"/>
 	<property name="build.test.classes" location="${build.dir}/hadoop-connector/tests" />
     <property name="junit.output.dir" value="${build.dir}/hadoop-connector/junit"/>
@@ -61,19 +63,7 @@
 
     <target depends="clean" name="cleanall"/>
 
-  <target name="requirehadoopdir">
-    <fail message="Property &quot;hadoop.dir&quot; needs to be set to a value">
-      <condition>
-          <or>
-            <equals arg1="${hadoop.dir}" arg2=""/>
-            <not><isset property="hadoop.dir"/></not>
-            <not><available file="${hadoop.dir}" type="dir"/></not>
-         </or>
-     </condition>
-    </fail>
-  </target>
-
-	<target depends="requirehadoopdir,init" name="compile">
+	<target depends="common.requirehadoopdir,init" name="compile">
     <echo>hadoop.dir: ${hadoop.dir}</echo>
     <echo></echo>
 		<mkdir dir="${build.classes}"/>
