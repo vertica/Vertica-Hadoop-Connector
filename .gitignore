@@ -2,4 +2,5 @@ hadoop-connector/build
 hadoop-example/build
 pig-connector/build
 squeal/build
+.build.properties
 

@@ -3,13 +3,16 @@
   <!--
   Common build file for properties or tasks that should be shared across sub-project build files.
   -->
+  
+  <property name="projectroot" value = "${basedir}/.."/>
+  <property file="${projectroot}/.build.properties"/>
 
   <!-- When making a versioned release, create a branch and change the build.version below -->
   <property name="build.version" value = "SNAPSHOT" />
 
   <!-- some common defaults -->
   <property name="hadoop-connector.jar"
-            value = "${basedir}/../hadoop-connector/build/hadoop-connector/jar/hadoop-vertica-${build.version}.jar" />
+            value = "${projectroot}/hadoop-connector/build/hadoop-connector/jar/hadoop-vertica-${build.version}.jar" />
 
   <!-- These require targets could be done better with a single macro -->
   <target name="requirehadoopdir">
