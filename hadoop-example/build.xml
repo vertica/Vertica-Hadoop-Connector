@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="jar" name="hadoop-vertica">
+<project basedir="." default="jar" name="hadoop-example">
+  <include file="../build-common.xml"/>
+
     <property environment="env"/>
 	<!--Required parameters. You have to specify these on the ANT command line -->
 	<!--JUNIT jars should be in the lib path. For e.g. specify using -lib -->
 	<property name="vertica.jar" value = "" />
 	<property name="hadoop.dir" value="" />
-	<property name="dist" value=""/>
 	<property name="doc.dir" value="" />
 	
 	<property name="jar.name" value="hadoop-vertica-example" />
@@ -17,6 +18,8 @@
     <property name="src.dir" location="${basedir}" />
 
 	<property name="build.dir" location="${basedir}/build" />
+  <property name="dist" value="${build.dir}/hadoop-example/jar"/>
+  <property name="jar.file" location="${dist}/${jar.name}-${build.version}.jar" />
 	<property name="build.classes" location="${build.dir}/hadoop-example/" />
 
 	<!-- Lesson: You can add location of jar files here -->
@@ -40,13 +43,13 @@
 
     <target name="clean">
         <delete dir="${build.classes}"/>
-        <delete file="${dist}/${jar.name}.jar"/>
+        <delete file="${jar.file}"/>
         <delete dir="${doc.dir}/hadoop-examples"/>
     </target>
 
     <target depends="clean" name="cleanall"/>
     
-	<target depends="init" name="compile">
+	<target depends="common.requirehadoopdir,init" name="compile">
 		<mkdir dir="${build.classes}"/>
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="${build.classes}" 
@@ -71,8 +74,9 @@
 	    	<format property="builtat" pattern="yyyy-MM-dd HH:mm:ss Z" timezone="America/New_York"/>
 		</tstamp>        
 		<exec executable="svnversion" outputproperty="svnversion"/>
-		<exec executable="uname" outputproperty="buildsystem"><arg value="-a"/></exec>
-    	<jar jarfile="${dist}/${jar.name}.jar" basedir="${build.classes}">
+    <delete file="${jar.file}"/>
+    <exec executable="uname" outputproperty="buildsystem"><arg value="-a"/></exec>
+    	<jar jarfile="${jar.file}" basedir="${build.classes}">
 			<manifest>
 				<attribute name="Built-By" value="${user.name}"/>
 			    <attribute name="Implementation-Vendor" value="Vertica Systems, Inc."/>

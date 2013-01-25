@@ -10,7 +10,7 @@
 
     <property environment="env"/>
 	<condition property="ispig07">
-		<contains string="${pig.version}" substring="0.7"/>
+		<contains string="${pig.jar}" substring="pig-0.7"/>
 	</condition>
 	<target name="executeRecursively">
 		<ant dir="hadoop-connector" target="${action}"/>
