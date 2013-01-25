@@ -1,3 +1,20 @@
+/*
+Copyright 2013, Twitter, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.vertica.hadoop;
 
 import org.apache.commons.logging.Log;
@@ -19,12 +36,12 @@ import java.sql.SQLException;
  *
  * An instance of this class should be initialized and setConf and setVerticaOutputFormat should be called.
  *
- * Implementors should consider subclassing VerticaTaskOutputCommitter instread of this class.
+ * Implementors should consider subclassing @{link VerticaTaskOutputCommitter} instead of this class.
  */
 public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
   protected final Log log = LogFactory.getLog(getClass());
 
-  private VerticaOutputFormat verticaOutputFormat;
+  private final VerticaOutputFormat verticaOutputFormat;
 
   /**
    * Initializes the OutputCommitter with a handle to the VerticaOutputFormat so the connection can
@@ -55,7 +72,7 @@ public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
   public void setupJob(JobContext jobContext) throws IOException { }
 
   /**
-   * This method is will only be called only once per job upon a final runstate of
+   * This method is will only be called once per job upon a final runstate of
    * {@link org.apache.hadoop.mapreduce.JobStatus.State#SUCCEEDED}. If this method throws an
    * exception the entire job will fail.
    */
@@ -98,8 +115,7 @@ public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
   protected final void sqlCommit(Connection connection) throws IOException {
     try {
       if (connection == null || connection.isClosed()) {
-        log.warn("Database connection not open so not commiting");
-        return;
+        throw new IOException("Trying to commit a connection that is null or closed: " + connection);
       }
     } catch (SQLException e) {
       throw new IOException("Exception calling isClosed on connection", e);
@@ -122,8 +138,7 @@ public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
 
     try {
       if (connection == null || connection.isClosed()) {
-        log.warn("Database connection not open so not rolling back");
-        return;
+        throw new IOException("Trying to rollback a connection that is null or closed: " + connection);
       }
     } catch (SQLException e) {
       throw new IOException("Exception calling isClosed on connection", e);

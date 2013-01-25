@@ -1,5 +1,22 @@
-/* Copyright (c) 2005 - 2012 Vertica, an HP company -*- Java -*- */
+/*
+Copyright (c) 2005 - 2012 Vertica, an HP company -*- Java -*-
+Copyright 2013, Twitter, Inc.
 
+
+Licensed under the Apache License, Version 2.0 (the "License");
+
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.vertica.hadoop;
 
 import java.io.IOException;
@@ -144,8 +161,7 @@ public class VerticaOutputFormat extends OutputFormat<Text, VerticaRecord> {
 			return new VerticaRecordWriter(
         getConnection(context.getConfiguration()), table, config.getBatchSize());
 		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new IOException(e.getMessage());
+			throw new IOException(e);
 		}
 	}
 
@@ -238,7 +254,12 @@ public class VerticaOutputFormat extends OutputFormat<Text, VerticaRecord> {
   @SuppressWarnings("unchecked")
   private OutputCommitter initializeOutputCommitter(Class outputCommitterClass,
                                                     Configuration configuration) throws IOException {
+    // If class extends AbstractVerticaOutputCommitter, create one of those
+    // else it needs to be an instance of OutputCommitter
+    // else throw exception
     if (AbstractVerticaOutputCommitter.class.isAssignableFrom(outputCommitterClass)) {
+
+      // iterate through the constructors to find the one we're looking for
       for (Constructor constructor : outputCommitterClass.getDeclaredConstructors()) {
         if (constructor.getGenericParameterTypes().length == 1 &&
           constructor.getGenericParameterTypes()[0].equals(VerticaOutputFormat.class)) {
@@ -255,10 +276,10 @@ public class VerticaOutputFormat extends OutputFormat<Text, VerticaRecord> {
                             "have a constructor that takes a VerticaOutputFormat object");
     } else if (OutputCommitter.class.isAssignableFrom(outputCommitterClass)) {
       return (OutputCommitter)ReflectionUtils.newInstance(outputCommitterClass, configuration);
-    } else {
-      throw new IOException(String.format("Configured output committer class %s must implement %s",
-        outputCommitterClass.getCanonicalName(), OutputCommitter.class.getCanonicalName()));
     }
+
+    throw new IOException(String.format("Configured output committer class %s must implement %s",
+      outputCommitterClass.getCanonicalName(), OutputCommitter.class.getCanonicalName()));
   }
 
   /**
@@ -277,7 +298,9 @@ public class VerticaOutputFormat extends OutputFormat<Text, VerticaRecord> {
       connection = config.getConnection(true);
       LOG.info("Initialized JDBC connection, autoCommit=" + connection.getAutoCommit());
       return connection;
-    } catch (Exception e) {
+    } catch (ClassNotFoundException e) {
+      throw new IOException(e);
+    } catch (SQLException e) {
       throw new IOException(e);
     }
   }

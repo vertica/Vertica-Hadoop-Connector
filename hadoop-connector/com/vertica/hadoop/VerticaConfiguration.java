@@ -1,5 +1,22 @@
-/* Copyright (c) 2005 - 2012 Vertica, an HP company -*- Java -*- */
+/*
+Copyright (c) 2005 - 2012 Vertica, an HP company -*- Java -*-
+Copyright 2013, Twitter, Inc.
 
+
+Licensed under the Apache License, Version 2.0 (the "License");
+
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.vertica.hadoop;
 
 import java.io.IOException;
@@ -314,6 +331,9 @@ public class VerticaConfiguration {
 				+ hosts[r.nextInt(hosts.length)] + ":" + port + "/" + database, 
 				 user, pass);
 
+    // if output is being written auto-commit must be disabled to prevent individual batches within
+    // a task from being committed. Instead we want all the batches in a task to be committed or
+    // rolled back upon task success or failure
     if (output) {
       connection.setAutoCommit(false);
     }
@@ -349,12 +369,12 @@ public class VerticaConfiguration {
 
 	/**
 	 * Query used to retrieve parameters for the input query. The result set must
-	 * match the input query parameters preceisely.
+	 * match the input query parameters precisely.
 	 * 
-	 * @param segment_params_query
+	 * @param segmentParamsQuery
 	 */
-	public void setParamsQuery(String segment_params_query) {
-		conf.set(QUERY_PARAM_PROP, segment_params_query);
+	public void setParamsQuery(String segmentParamsQuery) {
+		conf.set(QUERY_PARAM_PROP, segmentParamsQuery);
 	}
 
 	/**
@@ -539,7 +559,8 @@ public class VerticaConfiguration {
 	}
 
   /**
-   * Return the output committer that the job should use
+   * Return the output committer that the job should use. Note that the class specified and its
+   * dependencies must be in the classpath of both the submitted job and the tasks on the cluster.
    * @return the output committer class to use
    * @throws ClassNotFoundException if the output committer can't be found
    */
