@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="common">
+  <!--
+  Common build file for properties or tasks that should be shared across sub-project build files.
+  -->
+  
+  <property name="projectroot" value = "${basedir}/.."/>
+  <property file="${projectroot}/.build.properties"/>
+
+  <!-- When making a versioned release, create a branch and change the build.version below -->
+  <property name="build.version" value = "SNAPSHOT" />
+
+  <!-- some common defaults -->
+  <property name="hadoop-connector.jar"
+            value = "${projectroot}/hadoop-connector/build/hadoop-connector/jar/hadoop-vertica-${build.version}.jar" />
+
+  <!-- These require targets could be done better with a single macro -->
+  <target name="requirehadoopdir">
+    <fail message="Property &quot;hadoop.dir&quot; needs to be set to a value">
+      <condition>
+          <or>
+            <equals arg1="${hadoop.dir}" arg2=""/>
+            <not><isset property="hadoop.dir"/></not>
+            <not><available file="${hadoop.dir}" type="dir"/></not>
+         </or>
+     </condition>
+    </fail>
+  </target>
+
+  <target name="requirepigjar">
+    <fail message="Property &quot;pig.jar&quot; needs to be set to a valid jar file">
+      <condition>
+          <or>
+              <equals arg1="${pig.jar}" arg2=""/>
+              <not><isset property="pig.jar"/></not>
+              <not><available file="${pig.jar}" type="file"/></not>
+         </or>
+     </condition>
+    </fail>
+  </target>
+</project>

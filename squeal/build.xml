@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="jar" name="squeal">
+  <include file="../build-common.xml"/>
+
     <property environment="env"/>
 	<!--Required parameters. You have to specify these on the ANT command line -->
 	<!--JUNIT jars should be in the lib path. For e.g. specify using -lib -->
@@ -11,10 +13,8 @@
 	<property name="vertica.jar" value = "" />
 	<property name="hadoop-connector.jar" value = "" />
 	<property name="pig-connector.jar" value = "" />
-	<property name="hadoop.dir" value="" />
 	<property name="pig.jar" value="" />
-	<property name="dist" value=""/>
-	
+
 	<property name="jar.name" value="squeal" />
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.6"/>
@@ -25,6 +25,8 @@
 
 	<property name="build.dir" location="${basedir}/build" />
 	<property name="build.classes" location="${build.dir}/squeal/classes"/>
+  <property name="dist" value="${build.dir}/squeal/jar"/>
+  <property name="jar.file" location="${dist}/${jar.name}-${build.version}.jar" />
 
 	<!-- Lesson: You can add location of jar files here -->
     <path id="compile.classpath">
@@ -58,11 +60,25 @@
 
     <target name="clean">
         <delete dir="${build.dir}/squeal"/>
-        <delete file="${dist}/${dest.jar}"/>
+        <delete file="${jar.file}"/>
         <delete dir="${doc.dir}/squeal"/>
     </target>
 
-	<target depends="init" name="compile">
+  <target name="requirehadoopdir">
+    <fail message="Property &quot;hadoop.dir&quot; needs to be set to a value">
+      <condition>
+          <or>
+            <equals arg1="${hadoop.dir}" arg2=""/>
+            <not><isset property="hadoop.dir"/></not>
+            <not><available file="${hadoop.dir}" type="dir"/></not>
+         </or>
+     </condition>
+    </fail>
+  </target>
+
+	<target depends="common.requirehadoopdir,common.requirepigjar,init" name="compile">
+    <echo>hadoop.dir          : ${hadoop.dir}</echo>
+    <echo>pig.jar             : ${pig.jar}</echo>
 		<mkdir dir="${build.classes}"/>
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="${build.classes}" source="${source}" target="${target}">
@@ -87,7 +103,7 @@
 		</tstamp>        
 		<exec executable="svnversion" outputproperty="svnversion"/>
 		<exec executable="uname" outputproperty="buildsystem"><arg value="-a"/></exec>
-    	<jar jarfile="${dist}/${jar.name}.jar" basedir="${build.classes}">
+    	<jar jarfile="${jar.file}" basedir="${build.classes}">
 			<zipfileset src="${hadoop-connector.jar}"/>
 			<zipfileset src="${pig-connector.jar}"/>
 			<zipfileset src="${pig.jar}"/>
