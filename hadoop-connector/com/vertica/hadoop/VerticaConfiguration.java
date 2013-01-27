@@ -1,5 +1,22 @@
-/* Copyright (c) 2005 - 2012 Vertica, an HP company -*- Java -*- */
+/*
+Copyright (c) 2005 - 2012 Vertica, an HP company -*- Java -*-
+Copyright 2013, Twitter, Inc.
 
+
+Licensed under the Apache License, Version 2.0 (the "License");
+
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.vertica.hadoop;
 
 import java.io.IOException;
@@ -112,6 +129,11 @@ public class VerticaConfiguration {
 
 	/** Optional output format terminator */
 	public static final String OUTPUT_TERMINATOR_PROP = "mapred.vertica.output.terminator";
+
+  /** Optional override of the default OutputCommitter implementation */
+  public static final String OUTPUT_COMMITTER_CLASS_PARAM = "mapred.vertica.output.committer";
+
+  public static final String DEFAULT_OUTPUT_COMMITTER = VerticaTaskOutputCommitter.class.getCanonicalName();
 
 	/**
 	 * Override the sleep timer for optimize to poll when new projections have
@@ -305,9 +327,18 @@ public class VerticaConfiguration {
 		if (port == null)
 			throw new IOException("Vertica requires a port defined by "
 					+ PORT_PROP);
-		return DriverManager.getConnection("jdbc:vertica://"
+		Connection connection = DriverManager.getConnection("jdbc:vertica://"
 				+ hosts[r.nextInt(hosts.length)] + ":" + port + "/" + database, 
 				 user, pass);
+
+    // if output is being written auto-commit must be disabled to prevent individual batches within
+    // a task from being committed. Instead we want all the batches in a task to be committed or
+    // rolled back upon task success or failure
+    if (output) {
+      connection.setAutoCommit(false);
+    }
+
+    return connection;
 	}
 
 	public String getInputQuery() {
@@ -338,12 +369,12 @@ public class VerticaConfiguration {
 
 	/**
 	 * Query used to retrieve parameters for the input query. The result set must
-	 * match the input query parameters preceisely.
+	 * match the input query parameters precisely.
 	 * 
-	 * @param segment_params_query
+	 * @param segmentParamsQuery
 	 */
-	public void setParamsQuery(String segment_params_query) {
-		conf.set(QUERY_PARAM_PROP, segment_params_query);
+	public void setParamsQuery(String segmentParamsQuery) {
+		conf.set(QUERY_PARAM_PROP, segmentParamsQuery);
 	}
 
 	/**
@@ -376,7 +407,7 @@ public class VerticaConfiguration {
 	 * Sets a collection of lists. Each list is passed to an input split and used
 	 * as arguments to the input query.
 	 * 
-	 * @param segmentParams
+	 * @param segment_params
 	 * @throws IOException
 	*/
 	public void setInputParams(Collection<List<Object>> segment_params)
@@ -464,7 +495,7 @@ public class VerticaConfiguration {
 	/**
 	 * Set the definition of a table for output if it needs to be created
 	 * 
-	 * @param fieldNames
+	 * @param args
 	 */
 	public void setOutputTableDef(String... args) {
 		if(args == null || args.length == 0 || Arrays.asList(args).contains(null)) return;
@@ -526,6 +557,16 @@ public class VerticaConfiguration {
 	public String getOutputRecordTerminator() {
 		return conf.get(OUTPUT_TERMINATOR_PROP, RECORD_TERMINATOR);
 	}
+
+  /**
+   * Return the output committer that the job should use. Note that the class specified and its
+   * dependencies must be in the classpath of both the submitted job and the tasks on the cluster.
+   * @return the output committer class to use
+   * @throws ClassNotFoundException if the output committer can't be found
+   */
+  public Class getOutputCommitterClass() throws ClassNotFoundException {
+    return Class.forName(conf.get(OUTPUT_COMMITTER_CLASS_PARAM, DEFAULT_OUTPUT_COMMITTER));
+  }
 
 	/**
 	 * @deprecated  As of release 1.5, this function is not called from the Java API.
