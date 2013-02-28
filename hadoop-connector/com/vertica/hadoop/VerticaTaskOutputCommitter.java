@@ -25,7 +25,6 @@ import java.io.IOException;
 /**
  * Class that knows how to commit or rollback SQL connections at the task level. This class can be
  * subclassed to handle specific commit/rollback actions upon job completion.
- * @see VerticaConfiguration.
  */
 public class VerticaTaskOutputCommitter extends AbstractVerticaOutputCommitter {
 

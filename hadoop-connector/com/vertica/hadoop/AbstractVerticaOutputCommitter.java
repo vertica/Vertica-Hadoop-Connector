@@ -34,9 +34,7 @@ import java.sql.SQLException;
  * implementations of methods to allow easy overriding of specific behavior, as well as some common
  * SQL lifecycle methods.
  *
- * An instance of this class should be initialized and setConf and setVerticaOutputFormat should be called.
- *
- * Implementors should consider subclassing @{link VerticaTaskOutputCommitter} instead of this class.
+ * Implementers should consider subclassing @{link VerticaTaskOutputCommitter} instead of this class.
  */
 public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
   protected final Log log = LogFactory.getLog(getClass());
@@ -106,7 +104,7 @@ public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
   public void abortTask(TaskAttemptContext taskAttemptContext) throws IOException { }
 
 
-  // Final helper method below.
+  // Final helper methods below.
 
   /**
    * Commits and closes the connection if the connection is non-null and open.
