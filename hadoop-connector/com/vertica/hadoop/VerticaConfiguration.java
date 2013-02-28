@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Arrays;
 
@@ -64,7 +65,7 @@ public class VerticaConfiguration {
 	
 	/** JDBC debug logging level */
 	public static final String DEBUG_PROP = "mapred.vertica.debug";
- 
+	
 	/**Batch Size for JDBC batch size */
 	public static final String BATCH_SIZE_PROP = "mapred.vertica.batchsize";
 
@@ -183,6 +184,34 @@ public class VerticaConfiguration {
 		configureVertica(conf, hostnames, database, port, username, password, debug);
 		conf.set(DEBUG_PROP, debug);
 	}
+	
+	/**
+	  * Sets the Vertica database connection information in the (@link
+	  * Configuration)
+	  * 
+	  * @param conf
+	  *          the configuration
+	  * @param hostnames
+	  *          one or more hosts in the Vertica cluster
+	  * @param database
+	  *          the name of the Vertica database
+	  * @param username
+	  *          Vertica database username
+	  * @param password
+	  *          Vertica database password
+	  * @param port
+	  *          Vertica database port
+	  * @param debug
+	  *          JDBC debug logging level
+	  * @param logpath
+	  * 		 JDBC debug logging - location of logs to be written, default is current directory
+	  *          
+	  */
+	public static void configureVertica(Configuration conf, String[] hostnames,
+			String database, String port, String username, String password, String debug, String logpath) {
+		configureVertica(conf, hostnames, database, port, username, password, debug, logpath);
+		conf.set(DEBUG_LOGPATH_PROP, logpath);
+	}
 
 	/**
 	  * Sets the Vertica database connection information in the (@link
@@ -201,7 +230,9 @@ public class VerticaConfiguration {
 	  * @param port
 	  *          for the source Vertica database
 	  * @param debug
-	  *          JDBC debug logging level                  
+	  *          JDBC debug logging level        
+	  * @param logpath
+	  *          JDBC deug logging  - location of logs to be written, default is current directory          
 	  * @param output_hostnames
 	  *          one or more hosts in the output Cluster
 	  * @param output_database
@@ -214,10 +245,10 @@ public class VerticaConfiguration {
 	  *          for the target Vertica database         
 	  */
 	public static void configureVertica(Configuration conf, String[] hostnames,
-			String database, String port, String username, String password, String debug,
+			String database, String port, String username, String password, String debug, String logpath,
 			String[] output_hostnames, String output_database, String output_port,
 			String output_username, String output_password) {
-		configureVertica(conf, hostnames, database, port, username, password, debug);
+		configureVertica(conf, hostnames, database, port, username, password, debug , logpath);
 		conf.setStrings(OUTPUT_HOSTNAMES_PROP, output_hostnames);
 		conf.set(OUTPUT_DATABASE_PROP, output_database);
 		conf.set(OUTPUT_PORT_PROP, output_port);
@@ -273,6 +304,7 @@ public class VerticaConfiguration {
 		String database = conf.get(DATABASE_PROP);
 		String port = conf.get(PORT_PROP);
 		String debug = conf.get(DEBUG_PROP);
+		String logpath = conf.get(DEBUG_LOGPATH_PROP);
     
 
 		if((debug == null) || (debug == "")){
@@ -305,9 +337,9 @@ public class VerticaConfiguration {
 		if (port == null)
 			throw new IOException("Vertica requires a port defined by "
 					+ PORT_PROP);
-		return DriverManager.getConnection("jdbc:vertica://"
-				+ hosts[r.nextInt(hosts.length)] + ":" + port + "/" + database, 
-				 user, pass);
+		
+		return DriverManager.getConnection("jdbc:vertica://" + hosts[r.nextInt(hosts.length)] + ":" + port + "/" + database + "?loglevel=" + debug , user, pass);
+
 	}
 
 	public String getInputQuery() {
