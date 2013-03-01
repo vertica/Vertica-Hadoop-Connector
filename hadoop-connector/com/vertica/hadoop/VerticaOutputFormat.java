@@ -1,8 +1,26 @@
-/* Copyright (c) 2005 - 2012 Vertica, an HP company -*- Java -*- */
+/*
+Copyright (c) 2005 - 2012 Vertica, an HP company -*- Java -*-
+Copyright 2013, Twitter, Inc.
 
+
+Licensed under the Apache License, Version 2.0 (the "License");
+
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.vertica.hadoop;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -12,6 +30,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -20,18 +41,22 @@ import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.ReflectionUtils;
 
 /**
  * Output formatter for loading data to Vertica
  * 
  */
 public class VerticaOutputFormat extends OutputFormat<Text, VerticaRecord> {
-	/**
+  private static final Log LOG = LogFactory.getLog(VerticaOutputFormat.class);
+
+  /* JDBC connection is initialized on-demand and re-used */
+  private Connection connection;
+
+  /**
 	  * Set the output table
 	  * 
-	  * @param conf
+	  * @param job
 	  * @param tableName
 	  */
 	public static void setOutput(Job job, String tableName) {
@@ -133,11 +158,10 @@ public class VerticaOutputFormat extends OutputFormat<Text, VerticaRecord> {
 		String name = context.getJobName();
 		String table = config.getOutputTableName();
 		try {
-			Connection conn = config.getConnection(true);
-			return new VerticaRecordWriter(conn, table, config.getBatchSize());
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IOException(e.getMessage());
+			return new VerticaRecordWriter(
+        getConnection(context.getConfiguration()), table, config.getBatchSize());
+		} catch (SQLException e) {
+			throw new IOException(e);
 		}
 	}
 
@@ -204,7 +228,80 @@ public class VerticaOutputFormat extends OutputFormat<Text, VerticaRecord> {
 	/** (@inheritDoc) */
 	public OutputCommitter getOutputCommitter(TaskAttemptContext context)
 			throws IOException, InterruptedException {
-		return new FileOutputCommitter(FileOutputFormat.getOutputPath(context),
-				context);
+
+    VerticaConfiguration config = new VerticaConfiguration(context.getConfiguration());
+
+    try {
+      Class outputCommitterClass = config.getOutputCommitterClass();
+      LOG.info("Initializing OutputCommitter class " + outputCommitterClass.getCanonicalName());
+      return initializeOutputCommitter(outputCommitterClass, context.getConfiguration());
+    } catch (ClassNotFoundException e) {
+      throw new IOException("Could not find OutputCommitter class confiugured as " +
+        VerticaConfiguration.OUTPUT_COMMITTER_CLASS_PARAM, e);
+    }
 	}
+
+  /**
+   * Given a class, initializes it and returns it. If the class is a subclass of
+   * @{link AbstractVerticaOutputCommitter}, then the constructor that takes a
+   * @{link VerticaOutputFormat} object will be used. Alternatively, the class can implement
+   * @{link OutputCommitter} directly.
+   * @param outputCommitterClass
+   * @param configuration
+   * @return
+   * @throws IOException
+   */
+  @SuppressWarnings("unchecked")
+  private OutputCommitter initializeOutputCommitter(Class outputCommitterClass,
+                                                    Configuration configuration) throws IOException {
+    // If class extends AbstractVerticaOutputCommitter, create one of those
+    // else it needs to be an instance of OutputCommitter
+    // else throw exception
+    if (AbstractVerticaOutputCommitter.class.isAssignableFrom(outputCommitterClass)) {
+
+      // iterate through the constructors to find the one we're looking for
+      for (Constructor constructor : outputCommitterClass.getDeclaredConstructors()) {
+        if (constructor.getGenericParameterTypes().length == 1 &&
+          constructor.getGenericParameterTypes()[0].equals(VerticaOutputFormat.class)) {
+          try {
+            return (OutputCommitter)constructor.newInstance(this);
+          } catch (Exception e) {
+            throw new IOException("Could not initialize OutputCommitter class " +
+              outputCommitterClass.getCanonicalName(), e);
+          }
+        }
+      }
+
+      throw new IOException("Implementation of AbstractVerticaOutputCommitter must " +
+                            "have a constructor that takes a VerticaOutputFormat object");
+    } else if (OutputCommitter.class.isAssignableFrom(outputCommitterClass)) {
+      return (OutputCommitter)ReflectionUtils.newInstance(outputCommitterClass, configuration);
+    }
+
+    throw new IOException(String.format("Configured output committer class %s must implement %s",
+      outputCommitterClass.getCanonicalName(), OutputCommitter.class.getCanonicalName()));
+  }
+
+  /**
+   * Initialize the connection when it's first requested and keep a handle to it.
+   *
+   * @param configuration configuration object
+   * @return Connection to use
+   * @throws IOException if connection can not be made
+   */
+  synchronized Connection getConnection(Configuration configuration) throws IOException {
+    if (connection != null) { return connection; }
+
+    VerticaConfiguration config = new VerticaConfiguration(configuration);
+    try {
+      LOG.info("Initializing new JDBC connection...");
+      connection = config.getConnection(true);
+      LOG.info("Initialized JDBC connection, autoCommit=" + connection.getAutoCommit());
+      return connection;
+    } catch (ClassNotFoundException e) {
+      throw new IOException(e);
+    } catch (SQLException e) {
+      throw new IOException(e);
+    }
+  }
 }
