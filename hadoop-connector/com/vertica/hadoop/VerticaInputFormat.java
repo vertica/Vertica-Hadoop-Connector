@@ -164,8 +164,7 @@ public class VerticaInputFormat extends InputFormat<LongWritable, VerticaRecord>
 			return new VerticaRecordReader((VerticaInputSplit) split, 
 					context.getConfiguration());
 		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+                        throw new IOException(e);
 		}
 	}
 
@@ -285,7 +284,7 @@ public class VerticaInputFormat extends InputFormat<LongWritable, VerticaRecord>
 			}
 
 			if (count > 0) {
-				splits.add(new VerticaInputSplit(inputQuery, start, count));
+				splits.add(new VerticaInputSplit(inputQuery, start, start + count));
 			}
 		}
 
