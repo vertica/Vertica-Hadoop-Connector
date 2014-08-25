@@ -2,6 +2,7 @@
 
 package com.vertica.pig;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.ByteArrayInputStream;
@@ -11,6 +12,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -26,11 +28,15 @@ import org.apache.pig.data.DataByteArray;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.ResourceSchema;
 import org.apache.pig.ResourceStatistics;
+import org.apache.pig.builtin.BagToString;
+import org.apache.pig.data.TupleFactory;
 
 import com.vertica.hadoop.VerticaConfiguration;
 import com.vertica.hadoop.VerticaOutputFormat;
 import com.vertica.hadoop.VerticaRecordWriter;
 import com.vertica.hadoop.VerticaRecord;
+
+import org.joda.time.DateTime;
 
 public class VerticaStorer extends StoreFunc implements StoreMetadata {
 	private String [] hostnames = null;
@@ -45,6 +51,7 @@ public class VerticaStorer extends StoreFunc implements StoreMetadata {
 	private String tableDef = null;
 
 	private VerticaRecordWriter writer = null;
+    static final BagToString bts = new BagToString();
 
 	public VerticaStorer(String hostnames, String db, String port, String username, 
 			String password) {
@@ -135,6 +142,19 @@ public class VerticaStorer extends StoreFunc implements StoreMetadata {
 				case DataType.NULL: 
 					record.add(null);
 					break;
+                case DataType.DATETIME:
+                    record.add(new Timestamp(((DateTime)obj).getMillis()));
+                    break;
+
+                case DataType.TUPLE:
+                case DataType.MAP:
+                    record.add(new String(obj.toString()));
+                    break;
+
+                case DataType.BAG:
+                    record.add(bts.exec(TupleFactory.getInstance().newTuple(Arrays.asList(obj, ","))));
+                    break;
+
 				default:
 					throw new IOException("Vertica connector does not support " 
 							+ DataType.findTypeName(f.getType(i)));

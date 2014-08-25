@@ -503,14 +503,14 @@ public class VerticaRecord implements Writable {
 			return Types.VARCHAR;
 		} else if (obj instanceof Text) {
 			return Types.VARCHAR;
-		} else if (obj instanceof java.util.Date) {
+        } else if (obj instanceof Timestamp) {
+            return Types.TIMESTAMP;
+		} else if (obj.getClass() == java.util.Date.class) {
 			return Types.DATE;
 		} else if (obj instanceof Date) {
 			return Types.DATE;
 		} else if (obj instanceof Time) {
 			return Types.TIME;
-		} else if (obj instanceof Timestamp) {
-			return Types.TIMESTAMP;
 		} else {
 			throw new RuntimeException("Unknown type " + obj.getClass().getName()
 					 + " passed to Vertica Record");
@@ -657,86 +657,88 @@ public class VerticaRecord implements Writable {
 	}
 
 	public void write(PreparedStatement stmt) throws SQLException {
-		for (int i = 0; i < columns; i++) {
-			int oneBasedIndex = i + 1;
-			Object obj = values.get(i);
-			Integer type = types.get(i);
 
-			if (obj == null) {
-				stmt.setObject(oneBasedIndex, obj);
-				continue;
-			}
+        for (int i = 0; i < columns; i++) {
+            int oneBasedIndex = i + 1;
+            Object obj = values.get(i);
+            Integer type = types.get(i);
 
-			if (obj instanceof java.lang.String) {
-				stmt.setString(oneBasedIndex, (String) obj);
-				continue;
-			}
-			
-			switch (type) {
-				case Types.BIGINT:
-				case Types.INTEGER:
-				case Types.TINYINT:
-				case Types.SMALLINT:
-					stmt.setLong(oneBasedIndex, ((Number) obj).longValue());
-					break;
-				case Types.NUMERIC:
-					stmt.setBigDecimal(oneBasedIndex, (BigDecimal)obj);
-					break;
-				case Types.FLOAT:
-					stmt.setFloat(oneBasedIndex, (Float) obj);
-					break;
-				case Types.DOUBLE:
-					stmt.setDouble(oneBasedIndex, (Double) obj);
-					break;
-				case Types.BINARY:
-				case Types.LONGVARBINARY:
-				case Types.VARBINARY:
-					stmt.setBytes(oneBasedIndex,(byte[]) obj);
-					break;
-				case Types.BIT:
-				case Types.BOOLEAN:
-					stmt.setBoolean(oneBasedIndex, (Boolean) obj);
-					break;
-				case Types.CHAR:
-					stmt.setString(oneBasedIndex, ((Character) obj).toString());
-					break;
-				case Types.LONGNVARCHAR:
-				case Types.LONGVARCHAR:
-				case Types.NCHAR:
-				case Types.NVARCHAR:
-				case Types.VARCHAR:
-					stmt.setString(oneBasedIndex, (String) obj);
-					break;
-				case Types.DATE:
-					stmt.setDate(oneBasedIndex, (Date) obj);
-					break;
-				case Types.TIME:
-					stmt.setTime(oneBasedIndex, (Time) obj);
-					break;
-				case Types.TIMESTAMP:
-					stmt.setTimestamp(oneBasedIndex, (Timestamp) obj);
-					break;
+            if (obj == null) {
+                stmt.setObject(oneBasedIndex, obj);
+                continue;
+            }
+
+            if (obj instanceof java.lang.String) {
+                stmt.setString(oneBasedIndex, (String) obj);
+                continue;
+            }
+
+            switch (type) {
+                case Types.BIGINT:
+                case Types.INTEGER:
+                case Types.TINYINT:
+                case Types.SMALLINT:
+                    stmt.setLong(oneBasedIndex, ((Number) obj).longValue());
+                    break;
+                case Types.NUMERIC:
+                    stmt.setBigDecimal(oneBasedIndex, (BigDecimal) obj);
+                    break;
+                case Types.FLOAT:
+                    stmt.setFloat(oneBasedIndex, (Float) obj);
+                    break;
+                case Types.DOUBLE:
+                    stmt.setDouble(oneBasedIndex, (Double) obj);
+                    break;
+                case Types.BINARY:
+                case Types.LONGVARBINARY:
+                case Types.VARBINARY:
+                    stmt.setBytes(oneBasedIndex, (byte[]) obj);
+                    break;
+                case Types.BIT:
+                case Types.BOOLEAN:
+                    stmt.setBoolean(oneBasedIndex, (Boolean) obj);
+                    break;
+                case Types.CHAR:
+                    stmt.setString(oneBasedIndex, ((Character) obj).toString());
+                    break;
+                case Types.LONGNVARCHAR:
+                case Types.LONGVARCHAR:
+                case Types.NCHAR:
+                case Types.NVARCHAR:
+                case Types.VARCHAR:
+                    stmt.setString(oneBasedIndex, (String) obj);
+                    break;
+                case Types.DATE:
+                    stmt.setDate(oneBasedIndex, (Date) obj);
+                    break;
+                case Types.TIME:
+                    stmt.setTime(oneBasedIndex, (Time) obj);
+                    break;
+                case Types.TIMESTAMP:
+                    stmt.setTimestamp(oneBasedIndex, (Timestamp) obj);
+                    break;
 /*				case VerticaDayTimeInterval.INTERVAL_DAY:
-				case VerticaDayTimeInterval.INTERVAL_DAY_TO_HOUR:
-				case VerticaDayTimeInterval.INTERVAL_DAY_TO_MINUTE:
-				case VerticaDayTimeInterval.INTERVAL_DAY_TO_SECOND:
-				case VerticaDayTimeInterval.INTERVAL_HOUR:
-				case VerticaDayTimeInterval.INTERVAL_HOUR_TO_MINUTE:
-				case VerticaDayTimeInterval.INTERVAL_HOUR_TO_SECOND:
-				case VerticaDayTimeInterval.INTERVAL_MINUTE:
-				case VerticaDayTimeInterval.INTERVAL_MINUTE_TO_SECOND:
-				case VerticaDayTimeInterval.INTERVAL_SECOND:
-					stmt.setObject(i, obj);
-					break;
+            case VerticaDayTimeInterval.INTERVAL_DAY_TO_HOUR:
+            case VerticaDayTimeInterval.INTERVAL_DAY_TO_MINUTE:
+            case VerticaDayTimeInterval.INTERVAL_DAY_TO_SECOND:
+            case VerticaDayTimeInterval.INTERVAL_HOUR:
+            case VerticaDayTimeInterval.INTERVAL_HOUR_TO_MINUTE:
+            case VerticaDayTimeInterval.INTERVAL_HOUR_TO_SECOND:
+            case VerticaDayTimeInterval.INTERVAL_MINUTE:
+            case VerticaDayTimeInterval.INTERVAL_MINUTE_TO_SECOND:
+            case VerticaDayTimeInterval.INTERVAL_SECOND:
+                stmt.setObject(i, obj);
+                break;
 */
-				default:
-					throw new SQLException("Vertica Connector does not know how to process " 
-							+ types.get(i)
-							+ " for column "
-							+ names.get(i)
-						);
-			}
-		}
+                default:
+                    throw new SQLException("Vertica Connector does not know how to process "
+                            + types.get(i)
+                            + " for column "
+                            + names.get(i)
+                    );
+            }
+        }
+
 		stmt.addBatch();
 	}
 }

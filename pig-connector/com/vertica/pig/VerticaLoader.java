@@ -3,6 +3,7 @@
 package com.vertica.pig;
 
 import java.io.IOException;
+import org.joda.time.DateTime;
 
 import java.sql.ResultSetMetaData;
 import java.sql.Types;
@@ -67,7 +68,7 @@ public class VerticaLoader extends LoadFunc implements LoadMetadata{
   	DateFormat datefmt = new SimpleDateFormat("yyyyMMdd");
   	DateFormat timefmt = new SimpleDateFormat("HHmmss");
   	DateFormat tmstmpfmt = new SimpleDateFormat("yyyyMMddHHmmss");
-  	DateFormat sqlfmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  	DateFormat sqlfmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
 	
 	public VerticaLoader(String hostnames, String db, String port, String username, String password) {
 		this.hostnames = hostnames.split(",");
@@ -141,14 +142,14 @@ public class VerticaLoader extends LoadFunc implements LoadMetadata{
 				case Types.VARCHAR:
 					result.set(i, (String) obj);
 					break;
-				case Types.DATE:
-					result.set(i, new String(datefmt.format((Date) obj)));
-					break;
 				case Types.TIME:
 					result.set(i, new String(timefmt.format((Time) obj)));
 					break;
+                case Types.DATE:
+                    //result.set(i, new String(datefmt.format((Date) obj)));
 				case Types.TIMESTAMP:
-					result.set(i, new String(tmstmpfmt.format((Timestamp) obj)));
+					//result.set(i, new String(sqlfmt.format((Timestamp) obj)));
+                    result.set(i, new DateTime(obj));
 					break;
 				default:
 					throw new IOException("Unknown type value " + type);
@@ -227,9 +228,9 @@ public class VerticaLoader extends LoadFunc implements LoadMetadata{
 					case Types.NVARCHAR:
 					case Types.VARCHAR:
 					case Types.CHAR: type = DataType.CHARARRAY; break;
-					case Types.DATE:
-					case Types.TIME:
-					case Types.TIMESTAMP: type = DataType.LONG; break;
+					case Types.TIME: type = DataType.CHARARRAY; break;
+                    case Types.DATE:
+					case Types.TIMESTAMP: type = DataType.DATETIME; break;
         		}
         
 				FieldSchema field = new FieldSchema(name, type);
