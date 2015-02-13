@@ -177,8 +177,8 @@ public class VerticaRecord implements Writable {
 
 		for (int i = 1; i <= columns; i++) {
 			LOG.debug("Inserting " + meta.getCatalogName(i) + ":" + meta.getColumnType(i) + ":" + meta.getColumnTypeName(i) + " at " + i);
-			names.add(meta.getCatalogName(i));
-			nameMap.put(meta.getCatalogName(i),i-1);
+			names.add(meta.getColumnName(i));
+			nameMap.put(meta.getColumnName(i),i-1);
 //			if (meta.getColumnType(i) == 1111)
 //				types.add(VerticaDayTimeInterval.INTERVAL_DAY_TO_SECOND);
 //			else
