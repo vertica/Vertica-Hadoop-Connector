@@ -113,6 +113,9 @@ public class VerticaOutputFormat extends OutputFormat<Text, VerticaRecord> {
 			DatabaseMetaData dbmd = conn.getMetaData();
 			ResultSet rs = dbmd.getTables(null, vTable.getSchema(), vTable.getTable(), null);
 			boolean tableExists = rs.next();
+			
+			rs = dbmd.getSchemas(null, vTable.getSchema());
+			boolean schemaExists = rs.next();
 
 			stmt = conn.createStatement();
 
@@ -126,8 +129,13 @@ public class VerticaOutputFormat extends OutputFormat<Text, VerticaRecord> {
 				if (def == null)
 					throw new RuntimeException("Table " + vTable.getQualifiedName().toString()
 							+ " does not exist and no table definition provided");
-				if (!vTable.isDefaultSchema()) {
-					stmt.execute("CREATE SCHEMA IF NOT EXISTS " + vTable.getSchema());
+				if (!vTable.isDefaultSchema() && !schemaExists) {
+					try {
+					stmt.execute("CREATE SCHEMA " + vTable.getSchema());
+					}
+					catch(SQLException e) {
+						throw new RuntimeException("Exception caught while creating schema.", e);
+					}
 				}
 				StringBuffer tabledef = new StringBuffer("CREATE TABLE ").append(
 						vTable.getQualifiedName().toString()).append(" (");
